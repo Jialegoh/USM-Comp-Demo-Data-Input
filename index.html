@@ -30,6 +30,66 @@
       padding: 2rem;
     }
 
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .select-container {
+        padding: 1rem;
+      }
+
+      .button-container {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .alert-btn, #batteryDepleteBtn {
+        width: 100%;
+        padding: 1rem;
+        font-size: 0.875rem;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      th, td {
+        padding: 0.75rem;
+        font-size: 0.875rem;
+      }
+
+      .alert-container {
+        padding: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 0.75rem;
+      }
+
+      .header h1 {
+        font-size: 1.25rem;
+      }
+
+      select {
+        font-size: 0.875rem;
+      }
+
+      th, td {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+      }
+    }
+
     .header {
       background-color: var(--card-background);
       padding: 1rem 0;
@@ -113,6 +173,7 @@
       color: white;
       white-space: nowrap;
       min-width: 0;
+      text-align: center;
     }
 
     .alert-btn:hover {
@@ -153,6 +214,20 @@
       border-radius: 0.5rem;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
+
+    .table-container {
+      margin-bottom: 1rem;
+      background-color: var(--card-background);
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    table {
+      margin-bottom: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
   </style>
 </head>
 <body>
@@ -170,21 +245,23 @@
       </select>
     </div>
 
-    <table id="sensorTable" style="display:none">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Location</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Battery (%)</th>
-          <th>Created At</th>
-          <th>Updated At</th>
-        </tr>
-      </thead>
-      <tbody id="sensorTableBody"></tbody>
-    </table>
+    <div class="table-container">
+      <table id="sensorTable" style="display:none">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Battery (%)</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+          </tr>
+        </thead>
+        <tbody id="sensorTableBody"></tbody>
+      </table>
+    </div>
 
     <div class="alert-container" id="alertButtons" style="display:none">
       <div class="button-container">
