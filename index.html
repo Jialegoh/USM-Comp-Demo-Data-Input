@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sensor Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    select {
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sensor Data Viewer</h1>
+
+  <label for="sensorSelect">Select a Sensor:</label>
+  <select id="sensorSelect">
+    <option value="">-- Select --</option>
+  </select>
+
+  <table id="sensorTable" style="display:none">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Location</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Battery (%)</th>
+        <th>Created At</th>
+        <th>Updated At</th>
+      </tr>
+    </thead>
+    <tbody id="sensorTableBody"></tbody>
+  </table>
+
+  <button id="simulateAlert" style="display:none; margin-top: 20px; padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+    Simulate Alert
+  </button>
+
+  <script>
+    // Your Supabase project URL and public anon key
+    const SUPABASE_URL = 'https://ealrdnhvjfyiixcquang.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhbHJkbmh2amZ5aWl4Y3F1YW5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MTkyODYsImV4cCI6MjA2NzE5NTI4Nn0.y_To7_gzdcPXa5ZHodgN3Xu4pwvz1ADI2QFEiY70_6o';
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadSensors() {
+      const { data, error } = await supabase
+        .from('sensors')
+        .select('id, name');
+
+      if (error) {
+        alert('Error loading sensors: ' + error.message);
+        return;
+      }
+
+      const select = document.getElementById('sensorSelect');
+      data.forEach(sensor => {
+        const option = document.createElement('option');
+        option.value = sensor.id;
+        option.textContent = `${sensor.name} (ID: ${sensor.id})`;
+        select.appendChild(option);
+      });
+    }
+
+    async function showSensorDetails(sensorId) {
+      const { data, error } = await supabase
+        .from('sensors')
+        .select('*')
+        .eq('id', sensorId)
+        .single();
+
+      const table = document.getElementById('sensorTable');
+      const tbody = document.getElementById('sensorTableBody');
+      const simulateButton = document.getElementById('simulateAlert');
+      tbody.innerHTML = '';
+
+      if (error || !data) {
+        table.style.display = 'none';
+        simulateButton.style.display = 'none';
+        alert('Sensor not found.');
+        return;
+      }
+
+      const row = document.createElement('tr');
+      for (let key of ['id', 'name', 'location', 'type', 'status', 'battery_level', 'created_at', 'updated_at']) {
+        const td = document.createElement('td');
+        td.textContent = data[key];
+        row.appendChild(td);
+      }
+      tbody.appendChild(row);
+      table.style.display = 'table';
+      simulateButton.style.display = 'block';
+    }
+
+    async function simulateAlert(sensorId) {
+      const alertTypes = ['Fire Risk', 'Gas Leak', 'High Temperature', 'Low Battery', 'Malfunction'];
+      const severities = ['low', 'medium', 'high', 'critical'];
+      const locations = ['Processing Unit', 'Storage Area', 'Control Room', 'Break Area', 'Loading Dock'];
+      
+      // Generate random alert data
+      const randomType = alertTypes[Math.floor(Math.random() * alertTypes.length)];
+      const randomSeverity = severities[Math.floor(Math.random() * severities.length)];
+      const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+      
+      const alertData = {
+        sensor_id: sensorId,
+        type: randomType,
+        severity: randomSeverity,
+        description: `${randomType} detected in ${randomLocation}. Immediate inspection recommended.`,
+        status: 'new',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabase
+        .from('alerts')
+        .insert([alertData]);
+
+      if (error) {
+        alert('Error creating alert: ' + error.message);
+        return;
+      }
+
+      alert('Alert simulated successfully!');
+    }
+
+    document.getElementById('sensorSelect').addEventListener('change', function () {
+      const sensorId = this.value;
+      if (sensorId) {
+        showSensorDetails(sensorId);
+      } else {
+        document.getElementById('sensorTable').style.display = 'none';
+        document.getElementById('simulateAlert').style.display = 'none';
+      }
+    });
+
+    document.getElementById('simulateAlert').addEventListener('click', function() {
+      const sensorId = document.getElementById('sensorSelect').value;
+      if (sensorId) {
+        simulateAlert(sensorId);
+      }
+    });
+
+    loadSensors(); // Load dropdown on page load
+  </script>
+</body>
+</html>
