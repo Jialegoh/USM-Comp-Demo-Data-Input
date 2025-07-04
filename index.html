@@ -3,57 +3,209 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sensor Dashboard</title>
+  <title>Sensor Data Demo</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #2563eb;
+      --background-color: #f8fafc;
+      --card-background: #ffffff;
+      --text-color: #1e293b;
+      --border-color: #e2e8f0;
+    }
+
     body {
-      font-family: sans-serif;
-      padding: 20px;
+      font-family: 'Inter', sans-serif;
+      padding: 0;
+      margin: 0;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.5;
     }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 20px;
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
     }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
+
+    .header {
+      background-color: var(--card-background);
+      padding: 1rem 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
     }
-    th {
-      background-color: #f2f2f2;
+
+    .header h1 {
+      margin: 0;
+      font-size: 1.875rem;
+      font-weight: 600;
+      color: var(--text-color);
+      text-align: center;
     }
+
+    .select-container {
+      margin-bottom: 2rem;
+      background-color: var(--card-background);
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
     select {
-      padding: 5px;
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.375rem;
+      font-size: 1rem;
+      color: var(--text-color);
+      background-color: var(--card-background);
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      background-color: var(--card-background);
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background-color: #f8fafc;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .alert-btn {
+      flex: 1;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.1s ease-in-out, opacity 0.1s ease-in-out;
+      color: white;
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    .alert-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.9;
+    }
+
+    .alert-btn:active {
+      transform: translateY(0);
+    }
+
+    #batteryDepleteBtn {
+      flex: 1;
+      padding: 0.75rem 1.5rem;
+      background-color: #64748b;
+      color: white;
+      border: none;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    #batteryDepleteBtn:hover {
+      background-color: #475569;
+      transform: translateY(-1px);
+    }
+
+    #batteryDepleteBtn:active {
+      transform: translateY(0);
+    }
+
+    .alert-container {
+      background-color: var(--card-background);
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
   </style>
 </head>
 <body>
-  <h1>Sensor Data Viewer</h1>
+  <div class="header">
+    <div class="container">
+      <h1>Sensor Data Demo</h1>
+    </div>
+  </div>
 
-  <label for="sensorSelect">Select a Sensor:</label>
-  <select id="sensorSelect">
-    <option value="">-- Select --</option>
-  </select>
+  <div class="container">
+    <div class="select-container">
+      <label for="sensorSelect">Select a Sensor:</label>
+      <select id="sensorSelect">
+        <option value="">-- Select --</option>
+      </select>
+    </div>
 
-  <table id="sensorTable" style="display:none">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Location</th>
-        <th>Type</th>
-        <th>Status</th>
-        <th>Battery (%)</th>
-        <th>Created At</th>
-        <th>Updated At</th>
-      </tr>
-    </thead>
-    <tbody id="sensorTableBody"></tbody>
-  </table>
+    <table id="sensorTable" style="display:none">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Location</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Battery (%)</th>
+          <th>Created At</th>
+          <th>Updated At</th>
+        </tr>
+      </thead>
+      <tbody id="sensorTableBody"></tbody>
+    </table>
 
-  <button id="simulateAlert" style="display:none; margin-top: 20px; padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
-    Simulate Alert
-  </button>
+    <div class="alert-container" id="alertButtons" style="display:none">
+      <div class="button-container">
+        <button class="alert-btn" data-severity="low" style="background-color: #10b981;">
+          Simulate Low Alert
+        </button>
+        <button class="alert-btn" data-severity="medium" style="background-color: #f59e0b;">
+          Simulate Medium Alert
+        </button>
+        <button class="alert-btn" data-severity="high" style="background-color: #ef4444;">
+          Simulate High Alert
+        </button>
+        <button class="alert-btn" data-severity="critical" style="background-color: #991b1b;">
+          Simulate Critical Alert
+        </button>
+        <button id="batteryDepleteBtn">
+          Simulate Battery Depletion
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Your Supabase project URL and public anon key
@@ -90,12 +242,14 @@
 
       const table = document.getElementById('sensorTable');
       const tbody = document.getElementById('sensorTableBody');
-      const simulateButton = document.getElementById('simulateAlert');
+      const alertButtonsDiv = document.getElementById('alertButtons');
+      const batteryBtn = document.getElementById('batteryDepleteBtn');
       tbody.innerHTML = '';
 
       if (error || !data) {
         table.style.display = 'none';
-        simulateButton.style.display = 'none';
+        alertButtonsDiv.style.display = 'none';
+        batteryBtn.style.display = 'none';
         alert('Sensor not found.');
         return;
       }
@@ -108,24 +262,23 @@
       }
       tbody.appendChild(row);
       table.style.display = 'table';
-      simulateButton.style.display = 'block';
+      alertButtonsDiv.style.display = 'block';
+      batteryBtn.style.display = 'block';
     }
 
-    async function simulateAlert(sensorId) {
+    async function simulateAlert(sensorId, severity) {
       const alertTypes = ['Fire Risk', 'Gas Leak', 'High Temperature', 'Low Battery', 'Malfunction'];
-      const severities = ['low', 'medium', 'high', 'critical'];
       const locations = ['Processing Unit', 'Storage Area', 'Control Room', 'Break Area', 'Loading Dock'];
       
       // Generate random alert data
       const randomType = alertTypes[Math.floor(Math.random() * alertTypes.length)];
-      const randomSeverity = severities[Math.floor(Math.random() * severities.length)];
       const randomLocation = locations[Math.floor(Math.random() * locations.length)];
       
       const alertData = {
         sensor_id: sensorId,
         type: randomType,
-        severity: randomSeverity,
-        description: `${randomType} detected in ${randomLocation}. Immediate inspection recommended.`,
+        severity: severity,
+        description: `${randomType} detected in ${randomLocation}. ${severity.toUpperCase()} severity level. Immediate inspection recommended.`,
         status: 'new',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -140,7 +293,47 @@
         return;
       }
 
-      alert('Alert simulated successfully!');
+      alert(`${severity.toUpperCase()} alert simulated successfully!`);
+    }
+
+    async function simulateBatteryDepletion(sensorId) {
+      // First update the sensor's battery level to 0
+      const { error: updateError } = await supabase
+        .from('sensors')
+        .update({ 
+          battery_level: 0,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', sensorId);
+
+      if (updateError) {
+        alert('Error updating sensor battery: ' + updateError.message);
+        return;
+      }
+
+      // Then create a critical alert for the battery depletion
+      const alertData = {
+        sensor_id: sensorId,
+        type: 'Low Battery',
+        severity: 'critical',
+        description: 'Sensor battery depleted (0%). Immediate replacement required.',
+        status: 'new',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error: alertError } = await supabase
+        .from('alerts')
+        .insert([alertData]);
+
+      if (alertError) {
+        alert('Error creating battery alert: ' + alertError.message);
+        return;
+      }
+
+      // Refresh the sensor details display
+      showSensorDetails(sensorId);
+      alert('Battery depleted successfully! Sensor updated and alert created.');
     }
 
     document.getElementById('sensorSelect').addEventListener('change', function () {
@@ -149,15 +342,28 @@
         showSensorDetails(sensorId);
       } else {
         document.getElementById('sensorTable').style.display = 'none';
-        document.getElementById('simulateAlert').style.display = 'none';
+        document.getElementById('alertButtons').style.display = 'none';
+        document.getElementById('batteryDepleteBtn').style.display = 'none';
       }
     });
 
-    document.getElementById('simulateAlert').addEventListener('click', function() {
+    // Add click handler for battery depletion button
+    document.getElementById('batteryDepleteBtn').addEventListener('click', function() {
       const sensorId = document.getElementById('sensorSelect').value;
       if (sensorId) {
-        simulateAlert(sensorId);
+        simulateBatteryDepletion(sensorId);
       }
+    });
+
+    // Add click handlers for all alert buttons
+    document.querySelectorAll('.alert-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        const sensorId = document.getElementById('sensorSelect').value;
+        const severity = this.dataset.severity;
+        if (sensorId) {
+          simulateAlert(sensorId, severity);
+        }
+      });
     });
 
     loadSensors(); // Load dropdown on page load
